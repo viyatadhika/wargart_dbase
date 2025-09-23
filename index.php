@@ -62,7 +62,7 @@
     <!-- Judul -->
     <h1 class="mt-4 text-2xl text-gray-800">WARGA RT BSDK</h1>
     <p class="text-gray-500 text-base mb-6 px-2 leading-relaxed">
-      Wujud Asri, Rapi, Giat, Aman <br/> Rumah Tangga BSDK
+      Wujud Asri, Rapi, Giat, Aman <br/> Rumah Tangga BSDK :D
     </p>
 
     <!-- Tombol Checklist -->
