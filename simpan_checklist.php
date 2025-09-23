@@ -24,11 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $checklist_json = json_encode($checklist, JSON_UNESCAPED_UNICODE);
 
     // fungsi upload file
-    function uploadFile($file_input) {
+    function uploadFile($file_input)
+    {
         if (isset($_FILES[$file_input]) && $_FILES[$file_input]['error'] == 0) {
-            $allowed_types = ['image/jpeg','image/png','image/jpg'];
+            $allowed_types = ['image/jpeg', 'image/png', 'image/jpg'];
             if (!in_array($_FILES[$file_input]['type'], $allowed_types)) return NULL;
-            if ($_FILES[$file_input]['size'] > 2*1024*1024) return NULL; // max 2MB
+            if ($_FILES[$file_input]['size'] > 2 * 1024 * 1024) return NULL; // max 2MB
 
             $ext = pathinfo($_FILES[$file_input]['name'], PATHINFO_EXTENSION);
             $new_name = $file_input . '_' . time() . '.' . $ext;
@@ -73,4 +74,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("❌ Gagal simpan data: " . $stmt->error);
     }
 }
-?>
