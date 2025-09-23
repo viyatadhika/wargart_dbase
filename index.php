@@ -10,33 +10,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
   
   <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: #f9f9f9;
-    }
-    h1 {
-      font-weight: 600;
-    }
-    .link-animate {
-      transition: all 0.3s ease;
-      font-weight: 400;
-      position: relative;
-      overflow: hidden;
-    }
-    .link-animate:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-    }
-    .pulse-icon {
-      display: inline-block;
-      animation: pulseIcon 2s infinite ease-in-out;
-    }
-    @keyframes pulseIcon {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.15); opacity: 0.85; }
     }
     .animate-fade-in {
       animation: fadeIn 1s ease-in-out;
@@ -45,14 +24,17 @@
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .card-hover:hover {
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      transition: box-shadow 0.3s ease;
+    .pulse-icon {
+      animation: pulseIcon 2s infinite ease-in-out;
+    }
+    @keyframes pulseIcon {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.85; }
     }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
-  <div class="max-w-sm w-full bg-white rounded-2xl shadow-md overflow-hidden animate-fade-in card-hover p-6 text-center">
+  <div class="max-w-sm w-full bg-white/80 backdrop-blur-md rounded-3xl shadow-lg overflow-hidden animate-fade-in p-6 text-center">
     
     <!-- Foto Profil Bulat -->
     <div class="w-28 h-28 rounded-full overflow-hidden mx-auto shadow-md border-2 border-gray-200 transition-transform duration-300 hover:scale-105">
@@ -60,39 +42,53 @@
     </div>
 
     <!-- Judul -->
-    <h1 class="mt-4 text-2xl text-gray-800">WARGA RT BSDK</h1>
+    <h1 class="mt-4 text-2xl font-semibold text-gray-800">WARGA RT BSDK</h1>
     <p class="text-gray-500 text-base mb-6 px-2 leading-relaxed">
-      Wujud Asri, Rapi, Giat, Aman <br/> Rumah Tangga BSDK :D
+      Wujud Asri, Rapi, Giat, Aman <br/> Rumah Tangga BSDK
     </p>
 
     <!-- Tombol Checklist -->
-    <div class="space-y-3 text-base">
+    <div class="space-y-3 text-base font-medium">
       <a href="checklist_asrama.php"
-         class="link-animate flex items-center justify-center gap-2 w-full bg-pink-100 hover:bg-pink-200 text-pink-600 py-3 rounded-xl font-normal">
+         class="flex items-center justify-center gap-2 w-full py-3 rounded-full 
+                bg-gradient-to-r from-pink-400 to-pink-500 text-white 
+                shadow-md hover:shadow-lg active:scale-95 transition">
         <i class="fa-solid fa-bed pulse-icon"></i> Checklist Asrama
       </a>
-      <a href="#"
-         class="link-animate flex items-center justify-center gap-2 w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-600 py-3 rounded-xl font-normal">
+      <a href="checklist_gedung.php"
+         class="flex items-center justify-center gap-2 w-full py-3 rounded-full 
+                bg-gradient-to-r from-emerald-400 to-emerald-500 text-white 
+                shadow-md hover:shadow-lg active:scale-95 transition">
         <i class="fa-solid fa-building pulse-icon"></i> Checklist Gedung
       </a>
-      <a href="#" 
-         class="link-animate flex items-center justify-center gap-2 w-full bg-orange-100 hover:bg-orange-200 text-orange-600 py-3 rounded-xl font-normal">
+      <a href="checklist_auditorium.php"
+         class="flex items-center justify-center gap-2 w-full py-3 rounded-full 
+                bg-gradient-to-r from-orange-400 to-orange-500 text-white 
+                shadow-md hover:shadow-lg active:scale-95 transition">
         <i class="fa-solid fa-landmark pulse-icon"></i> Checklist Auditorium
       </a>
-      <a href="#" 
-         class="link-animate flex items-center justify-center gap-2 w-full bg-rose-100 hover:bg-rose-200 text-rose-600 py-3 rounded-xl font-normal">
+      <a href="checklist_rumah_pimpinan.php"
+         class="flex items-center justify-center gap-2 w-full py-3 rounded-full 
+                bg-gradient-to-r from-rose-400 to-rose-500 text-white 
+                shadow-md hover:shadow-lg active:scale-95 transition">
         <i class="fa-solid fa-house pulse-icon"></i> Checklist Rumah Pimpinan
       </a>
-      <a href="#" 
-         class="link-animate flex items-center justify-center gap-2 w-full bg-green-100 hover:bg-green-200 text-green-600 py-3 rounded-xl font-normal">
+      <a href="checklist_taman.php"
+         class="flex items-center justify-center gap-2 w-full py-3 rounded-full 
+                bg-gradient-to-r from-green-400 to-green-500 text-white 
+                shadow-md hover:shadow-lg active:scale-95 transition">
         <i class="fa-solid fa-tree pulse-icon"></i> Checklist Taman
       </a>
-      <a href="#" 
-         class="link-animate flex items-center justify-center gap-2 w-full bg-indigo-100 hover:bg-indigo-200 text-indigo-600 py-3 rounded-xl font-normal">
+      <a href="checklist_gondola.php"
+         class="flex items-center justify-center gap-2 w-full py-3 rounded-full 
+                bg-gradient-to-r from-indigo-400 to-indigo-500 text-white 
+                shadow-md hover:shadow-lg active:scale-95 transition">
         <i class="fa-solid fa-elevator pulse-icon"></i> Checklist Gondola
       </a>
-      <a href="#" 
-         class="link-animate flex items-center justify-center gap-2 w-full bg-yellow-100 hover:bg-yellow-200 text-yellow-600 py-3 rounded-xl font-normal">
+      <a href="checklist_general_cleaning.php"
+         class="flex items-center justify-center gap-2 w-full py-3 rounded-full 
+                bg-gradient-to-r from-yellow-400 to-yellow-500 text-white 
+                shadow-md hover:shadow-lg active:scale-95 transition">
         <i class="fa-solid fa-road pulse-icon"></i> Checklist General Cleaning
       </a>
     </div>
