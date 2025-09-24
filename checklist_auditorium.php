@@ -71,7 +71,6 @@ include 'header.php';
     </div>
   </div>
 
-  <!-- Area -->
   <?php
   $areas = [
     "Area Ruangan" => ["Menyapu & mengepel lantai", "Membersihkan meja & kursi", "Menata kursi & meja sesuai layout", "Membersihkan panggung/podium"],
@@ -79,16 +78,24 @@ include 'header.php';
     "Toilet" => ["Membersihkan lantai toilet", "Membersihkan toilet", "Membersihkan wastafel & keran", "Memastikan saluran air lancar", "Mengisi ulang sabun & tisu"],
     "Final Check" => ["Pastikan semua area bersih & rapi", "Mengecek perlengkapan sesuai standar"]
   ];
+
+  // Mapping icon untuk tiap area
+  $icons = [
+    "Area Ruangan" => "door-open",
+    "Koridor"      => "route",
+    "Toilet"       => "toilet",
+    "Final Check"  => "check-circle"
+  ];
   ?>
 
   <?php foreach ($areas as $area => $items): ?>
     <div class="bg-white rounded-2xl shadow p-6 mb-6" data-aos="fade-up">
       <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-        <i data-lucide="check-square" class="w-5 h-5 text-blue-500"></i> <?= $area ?>
+        <i class="<?= $icons[$area] ?? 'fa-solid fa-check-square text-blue-500' ?> w-5 h-5"></i> <?= $area ?>
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 checklist">
-        <?php foreach ($items as $item): ?>
-          <label class="flex justify-between items-center border-b pb-1">
+        <?php foreach ($items as $index => $item): ?>
+          <label class="flex justify-between items-center <?= $index < count($items) - 1 ? 'border-b pb-1' : '' ?>">
             <span class="check-label"><?= $item ?></span>
             <input type="checkbox" name="checklist[<?= $area ?>][]" value="<?= $item ?>"
               class="check-item w-4 h-4 accent-blue-500 transform transition-transform hover:scale-110">
@@ -97,6 +104,7 @@ include 'header.php';
       </div>
     </div>
   <?php endforeach; ?>
+
 
   <!-- Upload Foto -->
   <div id="uploadFoto" class="bg-white rounded-2xl shadow p-6 mb-6" data-aos="fade-up">
