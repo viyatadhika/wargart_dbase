@@ -19,34 +19,11 @@ $checklist = json_decode($data['checklist'], true);
 $selected  = $data['lantai'] ?? 'Lantai'; // area dari DB
 
 $template = [
-  'Kamar Tidur' => [
-    "Merapikan tempat tidur",
-    "Menyapu & mengepel kamar",
-    "Membersihkan meja & kursi",
-    "Membuka & Membersihkan jendela kamar",
-    "Membuang sampah & mengganti plastik",
-  ],
-  'Kamar Mandi' => [
-    "Membersihkan lantai kamar mandi",
-    "Membersihkan toilet",
-    "Membersihkan wastafel & keran",
-    "Memastikan saluran air lancar",
-    "Mengganti handuk"
-  ],
-  'Koridor' => [
-    "Menyapu seluruh area koridor",
-    "Mengepel lantai koridor",
-    "Membersihkan pagar/railing",
-    "Membersihkan dinding"
-  ],
-  'Amenities' => [
-    "Mengganti air mineral",
-    "Memastikan peralatan listrik (lampu, stop kontak, AC)"
-  ],
-    'Final Check' => [
-    "Pastikan semua area bersih & rapi",
-    "Mengecek perlengkapan sesuai standar"
-  ]
+  'Kamar Tidur' => ["Merapikan tempat tidur", "Menyapu & mengepel kamar", "Membersihkan meja & kursi", "Membuka & Membersihkan jendela kamar", "Membuang sampah & mengganti plastik"],
+  'Kamar Mandi' => ["Membersihkan lantai kamar mandi", "Membersihkan toilet", "Membersihkan wastafel & keran", "Memastikan saluran air lancar", "Mengganti handuk"],
+  'Koridor'     => ["Menyapu seluruh area koridor", "Mengepel lantai koridor", "Membersihkan pagar/railing", "Membersihkan dinding"],
+  'Amenities'   => ["Mengganti air mineral", "Memastikan peralatan listrik (lampu, stop kontak, AC)"],
+  'Final Check' => ["Pastikan semua area bersih & rapi", "Mengecek perlengkapan sesuai standar"]
 ];
 
 $group_rules = [
@@ -87,6 +64,7 @@ if ($progress >= 80) {
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -100,18 +78,28 @@ if ($progress >= 80) {
         sans-serif;
       background: #f9fafb;
     }
+
     /* Animasi halus */
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
+
     .animate-fadeInUp {
       animation: fadeInUp 0.6s ease-out forwards;
     }
   </style>
 </head>
+
 <body class="text-gray-800">
-<div class="max-w-5xl mx-auto p-6">
+  <div class="max-w-5xl mx-auto p-6">
     <!-- Card -->
     <div class="bg-white/80 backdrop-blur-md border border-gray-200 rounded-3xl shadow-lg p-6 md:p-8 animate-fadeInUp">
 
@@ -122,7 +110,7 @@ if ($progress >= 80) {
           Checklist Tersimpan
         </h1>
         <p class="text-sm text-gray-500 mt-1">
-          Form Pemeriksaan & Dokumentasi 
+          Form Pemeriksaan & Dokumentasi
           <?= !empty($title) ? htmlspecialchars($title) : "Umum" ?>
         </p>
       </div>
@@ -135,7 +123,7 @@ if ($progress >= 80) {
             <circle cx="40" cy="40" r="34" stroke-width="6" fill="none" class="text-gray-200" stroke="currentColor"></circle>
             <circle cx="40" cy="40" r="34" stroke-width="6" fill="none"
               stroke-dasharray="<?= $circ ?>"
-              stroke-dashoffset="<?= ($circ - ($progress/100)*$circ) ?>"
+              stroke-dashoffset="<?= ($circ - ($progress / 100) * $circ) ?>"
               class="<?= $progress_color ?>"
               stroke="currentColor"
               style="transition: stroke-dashoffset 1s ease;"></circle>
@@ -154,9 +142,9 @@ if ($progress >= 80) {
 
       <!-- Ucapan -->
       <p class="text-sm md:text-base text-gray-700 leading-relaxed text-justify mb-6">
-        Terima kasih banyak telah meluangkan waktu untuk mengisi form checklist ini.  
-        Data yang Anda berikan sangat membantu dalam 
-        <span class="font-semibold text-gray-900">Wujud Asri Rapi Giat Aman Rumah Tangga</span>  
+        Terima kasih banyak telah meluangkan waktu untuk mengisi form checklist ini.
+        Data yang Anda berikan sangat membantu dalam
+        <span class="font-semibold text-gray-900">Wujud Asri Rapi Giat Aman Rumah Tangga</span>
         Badan Strajak Diklat Kumdil Mahkamah Agung RI.
       </p>
 
@@ -181,6 +169,9 @@ if ($progress >= 80) {
     </div>
   </div>
 
-  <script>lucide.createIcons();</script>
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
+
 </html>
