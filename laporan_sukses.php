@@ -1,13 +1,35 @@
 <?php
-$title = "Asrama";
 include 'config.php';
 
-$id = $_GET['id'] ?? 0;
-if ($id == 0) die("❌ ID tidak ditemukan!");
+// ==========================
+// Ambil parameter
+// ==========================
+$type = $_GET['type'] ?? 'asrama';
+$id   = intval($_GET['id'] ?? 0);
+if ($id === 0) die("❌ ID tidak ditemukan!");
 
-// Ambil data
-$stmt = $conn->prepare("SELECT * FROM checklist_asrama WHERE id = ?");
-$stmt->bind_param("i", $id);
+// Peta halaman baru
+$formPages = [
+  'asrama'     => 'checklist_asrama.php',
+  'auditorium' => 'checklist_auditorium.php',
+];
+$newForm = $formPages[$type] ?? 'index.php';
+
+// ==========================
+// Ambil data sesuai type
+// ==========================
+if ($type === "asrama") {
+  $title = "Asrama";
+  $stmt = $conn->prepare("SELECT * FROM checklist_asrama WHERE id = ?");
+  $stmt->bind_param("i", $id);
+} elseif ($type === "auditorium") {
+  $title = "Auditorium";
+  $stmt = $conn->prepare("SELECT * FROM checklist_auditorium WHERE id = ?");
+  $stmt->bind_param("i", $id);
+} else {
+  die("❌ Type tidak valid!");
+}
+
 $stmt->execute();
 $result = $stmt->get_result();
 $data   = $result->fetch_assoc();
@@ -15,39 +37,129 @@ $stmt->close();
 
 if (!$data) die("❌ Data tidak ditemukan!");
 
-$checklist = json_decode($data['checklist'], true);
-$selected  = $data['lantai'] ?? 'Lantai'; // area dari DB
+// ==========================
+// Ambil checklist dari DB
+// ==========================
+$checklist = json_decode($data['checklist'], true) ?? [];
 
-$template = [
-  'Kamar Tidur' => ["Merapikan tempat tidur", "Menyapu & mengepel kamar", "Membersihkan meja & kursi", "Membuka & Membersihkan jendela kamar", "Membuang sampah & mengganti plastik"],
-  'Kamar Mandi' => ["Membersihkan lantai kamar mandi", "Membersihkan toilet", "Membersihkan wastafel & keran", "Memastikan saluran air lancar", "Mengganti handuk"],
-  'Koridor'     => ["Menyapu seluruh area koridor", "Mengepel lantai koridor", "Membersihkan pagar/railing", "Membersihkan dinding"],
-  'Amenities'   => ["Mengganti air mineral", "Memastikan peralatan listrik (lampu, stop kontak, AC)"],
-  'Final Check' => ["Pastikan semua area bersih & rapi", "Mengecek perlengkapan sesuai standar"]
+// ==========================
+// TEMPLATE ASRAMA
+// ==========================
+$template_asrama = [
+  'Kamar Tidur' => [
+    "Merapikan tempat tidur",
+    "Menyapu & mengepel kamar",
+    "Membersihkan meja & kursi",
+    "Membersihkan jendela kamar",
+    "Membuang sampah & mengganti plastik"
+  ],
+  'Kamar Mandi' => [
+    "Membersihkan lantai kamar mandi",
+    "Membersihkan toilet",
+    "Membersihkan wastafel & keran",
+    "Memastikan saluran air lancar",
+    "Mengganti handuk"
+  ],
+  'Amenities' => [
+    "Mengganti air mineral",
+    "Memastikan peralatan listrik (lampu, stop kontak, AC)"
+  ],
+  'Koridor' => [
+    "Menyapu seluruh area koridor",
+    "Mengepel lantai koridor",
+    "Membersihkan pagar/railing",
+    "Membersihkan dinding"
+  ],
+  'Final Check' => [
+    "Pastikan semua area bersih & rapi",
+    "Mengecek perlengkapan sesuai standar"
+  ]
 ];
 
-$group_rules = [
+$group_rules_asrama = [
   'Lantai'  => ['Kamar Tidur', 'Kamar Mandi', 'Amenities', 'Final Check'],
   'Koridor' => ['Koridor', 'Final Check']
 ];
 
+// ==========================
+// TEMPLATE AUDITORIUM
+// ==========================
+$template_auditorium = [
+  'Area Ruangan' => [
+    "Menyapu & mengepel lantai",
+    "Membersihkan meja & kursi",
+    "Menata kursi & meja sesuai layout",
+    "Membersihkan panggung/podium"
+  ],
+  'Perangkat Pendukung' => [
+    "Lampu menyala dengan baik",
+    "AC berfungsi normal",
+    "Sound system berfungsi baik",
+    "Proyektor dapat digunakan"
+  ],
+  'Koridor' => [
+    "Menyapu seluruh area koridor",
+    "Mengepel lantai koridor",
+    "Membersihkan pagar/railing",
+    "Membersihkan dinding"
+  ],
+  'Toilet' => [
+    "Membersihkan lantai toilet",
+    "Membersihkan toilet",
+    "Membersihkan wastafel & keran",
+    "Memastikan saluran air lancar",
+    "Mengisi ulang sabun & tisu"
+  ],
+  'Final Check' => [
+    "Pastikan semua area bersih & rapi",
+    "Mengecek perlengkapan sesuai standar"
+  ]
+];
+
+$group_rules_auditorium = [
+  'Auditorium' => ['Area Ruangan', 'Perangkat Pendukung', 'Final Check'],
+  'Kelas'      => ['Area Ruangan', 'Perangkat Pendukung', 'Final Check'],
+  'Koridor'    => ['Koridor', 'Final Check'],
+  'Toilet'     => ['Toilet', 'Final Check']
+];
+
+// ==========================
+// Pilih template & aturan
+// ==========================
+if ($type === "asrama") {
+  $selected    = $data['lantai'] ?? 'Lantai';
+  $template    = $template_asrama;
+  $group_rules = $group_rules_asrama;
+} else {
+  $selected    = $data['ruangan'] ?? 'Auditorium';
+  $template    = $template_auditorium;
+  $group_rules = $group_rules_auditorium;
+}
+
+// ==========================
+// Hitung progress (fix selected)
+// ==========================
 $total_items   = 0;
 $checked_items = 0;
 
-if (isset($group_rules[$selected])) {
-  foreach ($group_rules[$selected] as $kategori) {
-    $items = $template[$kategori] ?? [];
-    $total_items += count($items);
+foreach ($group_rules as $key => $categories) {
+  // Cocokkan exact atau mengandung kata (untuk Kelas 1, Kelas 2, dll)
+  if ($selected === $key || stripos($selected, $key) !== false) {
+    foreach ($categories as $kategori) {
+      $items = $template[$kategori] ?? [];
+      $total_items += count($items);
 
-    if (isset($checklist[$kategori])) {
-      $checked_items += count(array_intersect($checklist[$kategori], $items));
+      if (isset($checklist[$kategori])) {
+        $checked_items += count(array_intersect($checklist[$kategori], $items));
+      }
     }
   }
 }
 
+
 $progress = $total_items > 0 ? round(($checked_items / $total_items) * 100) : 0;
 
-// Tentukan status
+// Status berdasarkan progress
 if ($progress >= 80) {
   $progress_color = "text-green-500";
   $status_bg      = "bg-green-100 text-green-700";
@@ -68,18 +180,14 @@ if ($progress >= 80) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Laporan Checklist Asrama</title>
+  <title>Laporan Checklist <?= htmlspecialchars($title) ?></title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-        "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-        sans-serif;
       background: #f9fafb;
     }
 
-    /* Animasi halus */
     @keyframes fadeInUp {
       from {
         opacity: 0;
@@ -100,7 +208,6 @@ if ($progress >= 80) {
 
 <body class="text-gray-800">
   <div class="max-w-5xl mx-auto p-6">
-    <!-- Card -->
     <div class="bg-white/80 backdrop-blur-md border border-gray-200 rounded-3xl shadow-lg p-6 md:p-8 animate-fadeInUp">
 
       <!-- Judul -->
@@ -110,8 +217,7 @@ if ($progress >= 80) {
           Checklist Tersimpan
         </h1>
         <p class="text-sm text-gray-500 mt-1">
-          Form Pemeriksaan & Dokumentasi
-          <?= !empty($title) ? htmlspecialchars($title) : "Umum" ?>
+          Form Pemeriksaan & Dokumentasi <?= htmlspecialchars($title) ?>
         </p>
       </div>
 
@@ -142,8 +248,8 @@ if ($progress >= 80) {
 
       <!-- Ucapan -->
       <p class="text-sm md:text-base text-gray-700 leading-relaxed text-justify mb-6">
-        Terima kasih banyak telah meluangkan waktu untuk mengisi form checklist ini.
-        Data yang Anda berikan sangat membantu dalam
+        Terima kasih telah meluangkan waktu untuk mengisi form checklist ini.
+        Data Anda sangat membantu dalam
         <span class="font-semibold text-gray-900">Wujud Asri Rapi Giat Aman Rumah Tangga</span>
         Badan Strajak Diklat Kumdil Mahkamah Agung RI.
       </p>
@@ -155,7 +261,7 @@ if ($progress >= 80) {
           <i data-lucide="arrow-left" class="w-4 h-4"></i>
           <span>Kembali</span>
         </a>
-        <a href="checklist_asrama.php"
+        <a href="<?= $newForm ?>"
           class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium shadow-md hover:shadow-lg transition active:scale-95">
           <i data-lucide="edit-3" class="w-4 h-4"></i>
           <span>Isi Data Baru</span>
@@ -168,7 +274,6 @@ if ($progress >= 80) {
       </p>
     </div>
   </div>
-
   <script>
     lucide.createIcons();
   </script>

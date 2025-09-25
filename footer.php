@@ -1,196 +1,144 @@
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
 <script>
-  AOS.init({ duration: 800, once: true });
+  // Checklist Asrama
+  AOS.init({
+    duration: 800,
+    once: true
+  });
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const lantaiSelect = document.getElementById("lantaiSelect");
-    const asramaSelect = document.getElementById("asramaSelect");
-    const tanggalInput = document.getElementById("tanggalInput");
-    const namaPetugas = document.getElementById("namaPetugas");
-    const nomorKamarField = document.getElementById("nomorKamarField");
-    const nomorKamarInput = document.getElementById("nomorKamar"); 
-
-    // Sections
-    const areaKamar   = document.getElementById("areaKamar");
-    const areaMandi   = document.getElementById("areaMandi");
-    const amenities   = document.getElementById("amenities");
-    const koridor     = document.getElementById("areaKoridor");
-    const finalCheck  = document.getElementById("finalCheck");
-    const uploadFoto  = document.getElementById("uploadFoto");
-    const catatan     = document.getElementById("catatanKhusus");
-
-    // Progress bar
-    const progressBar = document.getElementById("progress-bar");
-    const progressText = document.getElementById("progress-text");
-
-    let totalCheckbox = 0;
-    let allCheckboxes = [];
-
-    // Update progress bar
-    function updateProgress() { 
-      let checked = allCheckboxes.filter(cb => cb.checked).length;
-      let percent = totalCheckbox > 0 ? Math.round((checked / totalCheckbox) * 100) : 0;
-      progressBar.style.width = percent + "%";
-      progressText.innerText = percent + "% Complete";
-    }
-
-    // Bind semua checklist yang terlihat
-    function bindCheckboxes() {
-      allCheckboxes.forEach(cb => cb.removeEventListener("change", updateProgress));
-
-      allCheckboxes = Array.from(document.querySelectorAll("input[type='checkbox']:not(:disabled)"))
-        .filter(cb => !cb.closest(".hidden"));
-
-      totalCheckbox = allCheckboxes.length;
-
-      allCheckboxes.forEach(cb => cb.addEventListener("change", updateProgress));
-      updateProgress();
-    }
-
-    // Reset hanya checklist + kamar + catatan + foto
-      function resetPartial() {
-        // reset checklist
-        allCheckboxes.forEach(cb => cb.checked = false);
-        document.querySelectorAll(".check-label").forEach(lbl => {
-          lbl.style.textDecoration = "none";
-          lbl.style.color = "#374151";
-        });
-
-        // reset nomor kamar
-        const nomorKamarInput = document.querySelector("#nomorKamarField input");
-        if (nomorKamarInput) nomorKamarInput.value = "";
-
-        // reset catatan
-        document.querySelectorAll("textarea").forEach(el => el.value = "");
-
-        // reset file upload
-        document.querySelectorAll("input[type='file']").forEach(input => input.value = "");
-        document.querySelectorAll("img[id^='preview']").forEach(img => img.classList.add("hidden"));
-        document.querySelectorAll("button[id^='remove']").forEach(btn => btn.classList.add("hidden"));
-
-        // reset progress
-        progressBar.style.width = "0%";
-        progressText.innerText = "0% Complete";
-
-        bindCheckboxes();
-      }
-
-      // Reset semua input, checklist, progress bar
-      function resetForm() {
-        resetPartial();
-        tanggalInput.value = "";
-        namaPetugas.value = "";
-        asramaSelect.selectedIndex = 0;
-        lantaiSelect.selectedIndex = 0;
-
-        // sembunyikan semua section
-        [nomorKamarField, areaKamar, areaMandi, amenities, koridor, finalCheck, uploadFoto, catatan]
-          .forEach(el => el.classList.add("hidden"));
-      }
-
-      // Saat lantai berubah
-      lantaiSelect.addEventListener("change", function () {
-        const value = this.value;
-        resetPartial();
-
-        [nomorKamarField, areaKamar, areaMandi, amenities, koridor, finalCheck, uploadFoto, catatan]
-          .forEach(el => el.classList.add("hidden"));
-
-        if (value.includes("Koridor")) {
-          nomorKamarField.classList.add("hidden");
-          nomorKamarInput.required = false;
-          nomorKamarInput.value = "-";
-          koridor.classList.remove("hidden");
-          finalCheck.classList.remove("hidden");
-          uploadFoto.classList.remove("hidden");
-          catatan.classList.remove("hidden");
-        } else if (value.includes("Lantai")) {
-          nomorKamarField.classList.remove("hidden");
-          nomorKamarInput.required = true;
-          nomorKamarInput.value = "";
-          areaKamar.classList.remove("hidden");
-          areaMandi.classList.remove("hidden");
-          amenities.classList.remove("hidden");
-          finalCheck.classList.remove("hidden");
-          uploadFoto.classList.remove("hidden");
-          catatan.classList.remove("hidden");
-        }
-
-        bindCheckboxes();
-      });
-
-      // Tombol reset manual
-      const resetBtn = document.getElementById("resetFormBtn");
-      resetBtn.addEventListener("click", resetForm);
-
-      // Inisialisasi awal
-      bindCheckboxes();
-    });
-
-  // Icon lucide
   lucide.createIcons();
 </script>
 
 <script>
-  // ✅ Preview gambar + validasi ukuran max 2 MB
-  function previewImage(event, previewId, removeBtnId) {
-    const input = event.target;
-    const file = input.files[0];
-    const preview = document.getElementById(previewId);
-    const removeBtn = document.getElementById(removeBtnId);
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("checklistForm");
+    const tanggalInput = document.getElementById("tanggalInput");
+    const namaPetugas = document.getElementById("namaPetugas");
+    const asramaSelect = document.getElementById("asramaSelect");
+    const lantaiSelect = document.getElementById("lantaiSelect");
+    const ruanganSelect = document.getElementById("ruanganSelect");
+    const nomorKamarField = document.getElementById("nomorKamarField");
+    const uploadFoto = document.getElementById("uploadFoto");
+    const catatanKhusus = document.getElementById("catatanKhusus");
+    const actionSection = document.getElementById("actionSection");
+    const progressBar = document.getElementById("progress-bar");
+    const progressText = document.getElementById("progress-text");
+    const resetBtn = document.getElementById("resetFormBtn");
 
-    if(file) {
-      if(file.size > 2 * 1024 * 1024) { 
-        alert("Ukuran file tidak boleh lebih dari 2 MB!");
-        input.value = "";
-        return;
-      }
+    const areas = document.querySelectorAll(".checklist-area");
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        preview.src = e.target.result;
-        preview.classList.remove('hidden');
-        removeBtn.classList.remove('hidden');
-      }
-      reader.readAsDataURL(file);
+    // ✅ Update progress bar
+    function updateProgress() {
+      const visibleCheckboxes = document.querySelectorAll(
+        ".checklist-area:not(.hidden) .check-item"
+      );
+      const total = visibleCheckboxes.length;
+      const checked = [...visibleCheckboxes].filter(cb => cb.checked).length;
+      const percent = total ? Math.round((checked / total) * 100) : 0;
+
+      progressBar.style.width = percent + "%";
+      progressText.textContent = percent + "% Complete";
     }
-  }
 
-  // ✅ Hapus gambar
-  function removeImage(inputId, previewId, removeBtnId) {
-    const input = document.getElementById(inputId);
-    const preview = document.getElementById(previewId);
-    const removeBtn = document.getElementById(removeBtnId);
+    // ✅ Reset hanya checklist, catatan & foto
+    function resetChecklistOnly() {
+      form.querySelectorAll(".check-item").forEach(cb => cb.checked = false);
+      form.querySelectorAll(".check-label").forEach(lbl => {
+        lbl.style.textDecoration = "none";
+        lbl.style.color = "#374151";
+      });
 
-    input.value = "";
-    preview.src = "";
-    preview.classList.add('hidden');
-    removeBtn.classList.add('hidden');
-  }
+      if (nomorKamarField) nomorKamarField.querySelector("input").value = "";
+      form.querySelectorAll("textarea").forEach(el => el.value = "");
+      form.querySelectorAll("input[type='file']").forEach(i => i.value = "");
+      form.querySelectorAll("img[id^='preview']").forEach(img => img.classList.add("hidden"));
+      form.querySelectorAll("button[id^='remove']").forEach(btn => btn.classList.add("hidden"));
 
-  // Event listener tombol hapus
-  document.getElementById('removePekerjaan').addEventListener('click', () => {
-    removeImage('foto_pekerjaan', 'previewPekerjaan', 'removePekerjaan');
-  });
-  document.getElementById('removeKerusakan').addEventListener('click', () => {
-    removeImage('foto_kerusakan', 'previewKerusakan', 'removeKerusakan');
-  });
-  document.getElementById('removePelayanan').addEventListener('click', () => {
-    removeImage('foto_pelayanan', 'previewPelayanan', 'removePelayanan');
-  });
+      progressBar.style.width = "0%";
+      progressText.textContent = "0% Complete";
+    }
 
-  // Klik container -> buka file dialog
-  document.querySelectorAll('.relative.border-2.cursor-pointer').forEach(container => {
-    const input = container.querySelector('input[type="file"]');
-    container.addEventListener('click', () => input.click());
+    // ✅ Reset full form
+    function resetForm() {
+      form.reset();
+      resetChecklistOnly();
+      areas.forEach(a => a.classList.add("hidden"));
+      uploadFoto.classList.add("hidden");
+      catatanKhusus.classList.add("hidden");
+      actionSection.classList.remove("hidden");
+    }
+
+    // ✅ Handle pilihan Asrama / Auditorium
+    function handleChecklist(value, type) {
+      const savedTanggal = tanggalInput.value;
+      const savedPetugas = namaPetugas.value;
+
+      resetChecklistOnly();
+      tanggalInput.value = savedTanggal;
+      namaPetugas.value = savedPetugas;
+
+      areas.forEach(area => area.classList.add("hidden"));
+      if (nomorKamarField) nomorKamarField.classList.add("hidden");
+
+      if (type === "asrama") {
+        if (value.includes("Lantai") && !value.includes("Koridor")) {
+          if (nomorKamarField) nomorKamarField.classList.remove("hidden");
+          document.querySelector('[data-area="Kamar Tidur"]').classList.remove("hidden");
+          document.querySelector('[data-area="Kamar Mandi"]').classList.remove("hidden");
+          document.querySelector('[data-area="Amenities"]').classList.remove("hidden");
+          document.querySelector('[data-area="Final Check"]').classList.remove("hidden");
+        } else if (value.includes("Koridor")) {
+          document.querySelector('[data-area="Koridor"]').classList.remove("hidden");
+          document.querySelector('[data-area="Final Check"]').classList.remove("hidden");
+        }
+      }
+
+      if (type === "auditorium") {
+        if (value.includes("Auditorium") || value.includes("Kelas")) {
+          document.querySelector('[data-area="Area Ruangan"]').classList.remove("hidden");
+          document.querySelector('[data-area="Perangkat Pendukung"]').classList.remove("hidden");
+          document.querySelector('[data-area="Final Check"]').classList.remove("hidden");
+        } else if (value.includes("Koridor")) {
+          document.querySelector('[data-area="Koridor"]').classList.remove("hidden");
+          document.querySelector('[data-area="Final Check"]').classList.remove("hidden");
+        } else if (value.includes("Toilet")) {
+          document.querySelector('[data-area="Toilet"]').classList.remove("hidden");
+          document.querySelector('[data-area="Final Check"]').classList.remove("hidden");
+        }
+      }
+
+      if (value) {
+        uploadFoto.classList.remove("hidden");
+        catatanKhusus.classList.remove("hidden");
+        actionSection.classList.remove("hidden");
+      }
+
+      updateProgress();
+    }
+
+    // ✅ Event listener
+    if (lantaiSelect) {
+      lantaiSelect.addEventListener("change", () => {
+        handleChecklist(lantaiSelect.value, "asrama");
+      });
+    }
+    if (ruanganSelect) {
+      ruanganSelect.addEventListener("change", () => {
+        handleChecklist(ruanganSelect.value, "auditorium");
+      });
+    }
+    form.addEventListener("change", (e) => {
+      if (e.target.classList.contains("check-item")) updateProgress();
+    });
+    resetBtn.addEventListener("click", resetForm);
   });
 
   // Animasi coret checklist
   document.querySelectorAll('.check-item').forEach((checkbox) => {
     checkbox.addEventListener('change', function() {
       const label = this.closest('label').querySelector('.check-label');
-      if(this.checked) {
+      if (this.checked) {
         label.style.textDecoration = "line-through";
         label.style.transition = "all 0.3s ease";
         label.style.color = "#9ca3af"; // abu-abu
@@ -200,7 +148,64 @@
       }
     });
   });
-</script>
 
+  // ambil semua input file
+  document.querySelectorAll(".foto-input").forEach(input => {
+    input.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      const previewId = "preview-" + input.id;
+      const removeId = "remove-" + input.id;
+      const preview = document.getElementById(previewId);
+      const removeBtn = document.getElementById(removeId);
+
+      // validasi ukuran max 2 MB
+      if (file && file.size > 2 * 1024 * 1024) {
+        alert("Ukuran file tidak boleh lebih dari 2 MB!");
+        input.value = "";
+        preview.classList.add("hidden");
+        removeBtn.classList.add("hidden");
+        return;
+      }
+
+      // tampilkan preview
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.classList.remove("hidden");
+          removeBtn.classList.remove("hidden");
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+
+  // tombol hapus preview
+  document.querySelectorAll(".remove-btn").forEach(button => {
+    button.addEventListener("click", (e) => {
+      e.stopPropagation(); // ⛔ cegah trigger container click
+      const inputId = button.id.replace("remove-", "");
+      const input = document.getElementById(inputId);
+      const preview = document.getElementById("preview-" + inputId);
+
+      input.value = "";
+      preview.src = "";
+      preview.classList.add("hidden");
+      button.classList.add("hidden");
+    });
+  });
+
+  // klik container → buka file dialog
+  document.querySelectorAll(".foto-container").forEach(container => {
+    const input = container.querySelector(".foto-input");
+    container.addEventListener("click", (e) => {
+      // biar tombol "X" tidak ikut trigger open dialog
+      if (!e.target.classList.contains("remove-btn")) {
+        input.click();
+      }
+    });
+  });
+</script>
 </body>
+
 </html>
