@@ -81,6 +81,31 @@ elseif ($formType === "auditorium") {
     } else {
         echo "Error: " . $stmt->error;
     }
+}
+// =====================
+// SIMPAN DATA RUMPIM
+// =====================
+elseif ($formType === "rumpim") {
+    $rumah = $_POST['rumah'] ?? '';
+    $nomor_rumah = $_POST['nomor_rumah'] ?? '';
+    // Jika pilih Rumah Dinas Eselon I, isi otomatis '-'
+    if (stripos($rumah, 'Rumah Dinas Eselon I') !== false) {
+        $nomor_rumah = '-';
+    }
+
+    $stmt = $conn->prepare("INSERT INTO checklist_rumpim 
+        (tanggal, nama_petugas, rumah, nomor_rumah, checklist, foto_pekerjaan, foto_kerusakan, foto_pelayanan, catatan_kerusakan) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssssss", $tanggal, $nama_petugas, $rumah, $nomor_rumah, $checklistData, $foto_pekerjaan, $foto_kerusakan, $foto_pelayanan, $catatan);
+
+    if ($stmt->execute()) {
+        $last_id = $conn->insert_id; // ✅ gunakan $conn bukan $stmt
+        $stmt->close();
+        header("Location: laporan_sukses.php?type=rumpim&id=$last_id");
+        exit;
+    } else {
+        echo "Error: " . $stmt->error;
+    }
 } else {
     echo "Form type tidak dikenali!";
 }

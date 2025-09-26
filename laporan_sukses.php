@@ -12,6 +12,7 @@ if ($id === 0) die("❌ ID tidak ditemukan!");
 $formPages = [
   'asrama'     => 'checklist_asrama.php',
   'auditorium' => 'checklist_auditorium.php',
+  'rumpim' => 'checklist_rumpim.php',
 ];
 $newForm = $formPages[$type] ?? 'index.php';
 
@@ -25,6 +26,10 @@ if ($type === "asrama") {
 } elseif ($type === "auditorium") {
   $title = "Auditorium";
   $stmt = $conn->prepare("SELECT * FROM checklist_auditorium WHERE id = ?");
+  $stmt->bind_param("i", $id);
+} elseif ($type === "rumpim") {
+  $title = "Rumah Pimpinan";
+  $stmt = $conn->prepare("SELECT * FROM checklist_rumpim WHERE id = ?");
   $stmt->bind_param("i", $id);
 } else {
   die("❌ Type tidak valid!");
@@ -124,6 +129,35 @@ $group_rules_auditorium = [
 ];
 
 // ==========================
+// TEMPLATE RUMPIM
+// ==========================
+$template_auditorium = [
+  'Area Utama' => [
+    "Menyapu & mengepel seluruh lantai rumah",
+    "Membersihkan perabot (meja, kursi, lemari)",
+    "Menata kamar tidur (merapikan tempat tidur, gorden, karpet)",
+    "Membersihkan dapur (kompor, wastafel, meja dapur, peralatan masak)",
+    "Mengosongkan tempat sampah & mengganti kantong plastik",
+    "Membersihkan kaca, jendela, pintu, & ventilasi",
+    "Memastikan peralatan listrik (lampu, stop kontak, AC)"
+  ],
+  'Kamar Mandi' => [
+    "Membersihkan lantai kamar mandi",
+    "Membersihkan toilet",
+    "Membersihkan wastafel & keran",
+    "Memastikan saluran air lancar"
+  ],
+  'Final Check' => [
+    "Pastikan semua area bersih & rapi",
+    "Mengecek perlengkapan sesuai standar"
+  ]
+];
+
+$group_rules_auditorium = [
+  'Rumah Dinas' => ['Area Utama', 'Kamar Mandi', 'Final Check']
+];
+
+// ==========================
 // Pilih template & aturan
 // ==========================
 $total_items   = 0;
@@ -141,7 +175,12 @@ if ($type === "asrama") {
   $selected    = $data['ruangan'] ?? 'Auditorium';
   $template    = $template_auditorium;
   $group_rules = $group_rules_auditorium;
+} elseif ($type === "rumpim") {
+  $selected    = $data['rumah'] ?? 'Rumah Dinas';
+  $template    = $template_auditorium;
+  $group_rules = $group_rules_auditorium;
 }
+
 
 
 // ==========================
@@ -190,6 +229,16 @@ foreach ($group_rules as $key => $categories) {
   }
   // khusus toilet
   elseif ($key === "Toilet" && stripos($selected, "Toilet") !== false) {
+    foreach ($categories as $kategori) {
+      $items = $template[$kategori] ?? [];
+      $total_items += count($items);
+      if (isset($checklist[$kategori])) {
+        $checked_items += count(array_intersect($checklist[$kategori], $items));
+      }
+    }
+  }
+  // khusus rumpim
+  elseif ($key === "Rumah Dinas" && stripos($selected, "Rumah Dinas") !== false) {
     foreach ($categories as $kategori) {
       $items = $template[$kategori] ?? [];
       $total_items += count($items);

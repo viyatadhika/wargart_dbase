@@ -6,7 +6,7 @@ include 'header.php';
 
 <!-- Form Checklist -->
 <form id="checklistForm" action="simpan_checklist.php" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="form_type" value="auditorium">
+    <input type="hidden" name="form_type" value="rumpim">
     <!-- Informasi Dasar -->
     <div class="bg-white rounded-2xl shadow-md p-6 mb-6" data-aos="fade-up">
         <h2 class="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800">
@@ -15,100 +15,98 @@ include 'header.php';
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
             <!-- Tanggal -->
             <div>
-                <label class="flex items-center text-sm font-medium text-gray-700 mb-1">
+                <label class="flex items-center text-sm font-medium text-gray-700 tracking-wide mb-1">
                     <i data-lucide="calendar" class="w-4 h-4 text-blue-500 mr-1"></i> Tanggal
                 </label>
-                <input type="date" name="tanggal" id="tanggalInput" class="w-full border rounded-xl p-3 focus:ring-2 focus:ring-blue-300" required>
+                <input type="date" name="tanggal" id="tanggalInput"
+                    class="w-full border border-gray-300 rounded-xl p-3 text-gray-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-300 transition"
+                    required />
             </div>
 
             <!-- Nama Petugas -->
             <div>
-                <label class="flex items-center text-sm font-medium text-gray-700 mb-1">
+                <label class="flex items-center text-sm font-medium text-gray-700 tracking-wide mb-1">
                     <i data-lucide="user" class="w-4 h-4 text-blue-500 mr-1"></i> Nama Petugas
                 </label>
                 <input type="text" name="nama_petugas" id="namaPetugas" placeholder="Masukkan nama petugas"
-                    class="w-full border rounded-xl p-3 focus:ring-2 focus:ring-blue-300" required>
+                    class="w-full border border-gray-300 rounded-xl p-3 text-gray-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-300 transition"
+                    required />
             </div>
 
-            <!-- Ruangan -->
+            <!-- Blok Rumah -->
             <div>
                 <label class="flex items-center text-sm font-medium text-gray-700 tracking-wide mb-1">
-                    <i data-lucide="building-2" class="w-4 h-4 text-blue-500 mr-1"></i> Nama Ruangan
+                    <i data-lucide="house" class="w-4 h-4 text-blue-500 mr-1"></i> Blok Rumah Dinas
                 </label>
-                <select name="ruangan" id="ruanganSelect"
+                <select name="rumah" id="rumahSelect"
                     class="w-full border border-gray-300 rounded-xl p-3 text-gray-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-300 transition"
                     required>
-                    <option value="" disabled selected>Pilih Ruangan</option>
-                    <option value="Auditorium">Auditorium</option>
-                    <?php for ($i = 1; $i <= 19; $i++): ?>
-                        <option value="Kelas <?= $i ?>">Kelas <?= $i ?></option>
-                    <?php endfor; ?>
-                    <option value="Koridor Lantai Basement">Koridor Lantai Basement</option>
-                    <option value="Koridor Lantai 1">Koridor Lantai 1</option>
-                    <option value="Koridor Lantai 2">Koridor Lantai 2</option>
-                    <option value="Toilet Lantai Basement">Toilet Lantai Basement</option>
-                    <option value="Toilet Lantai 1">Toilet Lantai 1</option>
-                    <option value="Toilet Lantai 2">Toilet Lantai 2</option>
+                    <option value="" disabled selected>Pilih Rumah Dinas</option>
+                    <option value="Rumah Dinas Eselon I">Rumah Dinas Eselon I</option>
+                    <option value="Rumah Dinas Eselon II">Rumah Dinas Eselon II</option>
+                    <option value="Rumah Dinas Eselon III">Rumah Dinas Eselon III</option>
+                    <option value="Rumah Dinas Pimpinan">Rumah Dinas Pimpinan</option>
                 </select>
             </div>
+
+            <!-- Nomor Rumah (default hidden) -->
+            <div id="nomorRumahField" class="hidden">
+                <label class="flex items-center text-sm font-medium text-gray-700 tracking-wide mb-1">
+                    <i data-lucide="door-closed" class="w-4 h-4 text-blue-500 mr-1"></i> Nomor Kamar
+                </label>
+                <input type="text" id="nomorRumah" name="nomor_rumah" placeholder="Masukkan nomor rumah"
+                    class="w-full border border-gray-300 rounded-xl p-3 text-gray-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-300 transition">
+            </div>
+
         </div>
     </div>
 
     <?php
     $areas = [
-        "Area Ruangan"        => [
-            "Menyapu & mengepel lantai",
-            "Membersihkan meja & kursi",
-            "Menata kursi & meja sesuai layout",
-            "Membersihkan panggung/podium"
+        "Area Utama" => [
+            "Menyapu & mengepel seluruh lantai rumah",
+            "Membersihkan perabot (meja, kursi, lemari)",
+            "Menata kamar tidur (merapikan tempat tidur, gorden, karpet)",
+            "Membersihkan dapur (kompor, wastafel, meja dapur, peralatan masak)",
+            "Mengosongkan tempat sampah & mengganti kantong plastik",
+            "Membersihkan kaca, jendela, pintu, & ventilasi",
+            "Memastikan peralatan listrik (lampu, stop kontak, AC)"
         ],
-        "Perangkat Pendukung" => [
-            "Lampu menyala dengan baik",
-            "AC berfungsi normal",
-            "Sound system berfungsi baik",
-            "Proyektor dapat digunakan"
-        ],
-        "Koridor"             => [
-            "Menyapu seluruh area koridor",
-            "Mengepel lantai koridor",
-            "Membersihkan pagar/railing",
-            "Membersihkan dinding"
-        ],
-        "Toilet"              => [
-            "Membersihkan lantai toilet",
+        "Kamar Mandi" => [
+            "Membersihkan lantai kamar mandi",
             "Membersihkan toilet",
             "Membersihkan wastafel & keran",
-            "Memastikan saluran air lancar",
-            "Mengisi ulang sabun & tisu"
+            "Memastikan saluran air lancar"
         ],
-        "Final Check"         => [
+        "Final Check" => [
             "Pastikan semua area bersih & rapi",
             "Mengecek perlengkapan sesuai standar"
         ]
     ];
 
     $icons = [
-        "Area Ruangan"          => "door-open",
-        "Perangkat Pendukung"   => "package",
-        "Koridor"               => "route",
-        "Toilet"                => "toilet",
-        "Final Check"           => "check-circle"
+        "Area Utama"    => "sofa",
+        "Kamar Mandi"   => "shower-head",
+        "Final Check"   => "check-circle"
     ];
     ?>
 
+    <!-- Checklist Area -->
     <?php foreach ($areas as $area => $items): ?>
-        <div class="bg-white rounded-2xl shadow p-6 mb-6 checklist-area hidden" data-area="<?= $area ?>" data-aos="fade-up">
+        <div class="bg-white rounded-xl shadow p-6 mb-6 checklist-area hidden"
+            data-area="<?= $area ?>" data-aos="fade-up">
             <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
                 <i data-lucide="<?= $icons[$area] ?? 'check-square' ?>" class="w-5 h-5 text-blue-500"></i> <?= $area ?>
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 checklist">
-                <?php foreach ($items as $index => $item): ?>
-                    <label class="flex justify-between items-center <?= $index < count($items) - 1 ? 'border-b pb-1' : '' ?>">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <?php foreach ($items as $item): ?>
+                    <label class="flex justify-between items-center border-b pb-1">
                         <span class="check-label"><?= $item ?></span>
-                        <input type="checkbox" name="checklist[<?= $area ?>][]" value="<?= $item ?>"
-                            class="check-item w-4 h-4 accent-blue-500 transform transition-transform hover:scale-110">
+                        <input type="checkbox" class="check-item w-4 h-4 accent-blue-500"
+                            name="checklist[<?= $area ?>][]" value="<?= $item ?>">
                     </label>
                 <?php endforeach; ?>
             </div>
@@ -142,7 +140,8 @@ include 'header.php';
     <!-- Catatan Khusus / Kendala -->
     <div id="catatanKhusus" class="bg-white rounded-2xl shadow p-6 mb-6 hidden" data-aos="fade-up">
         <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-            <i data-lucide="alert-circle" class="w-5 h-5 text-blue-500"></i> Catatan Khusus / Kendala
+            <i data-lucide="alert-circle" class="w-5 h-5 text-blue-500"></i>
+            Catatan Khusus / Kendala yang Ditemui
         </h2>
         <textarea name="catatan_kerusakan" rows="4" placeholder="Tuliskan kendala atau catatan khusus di sini..."
             class="border rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-400"></textarea>

@@ -19,6 +19,8 @@
     const lantaiSelect = document.getElementById("lantaiSelect");
     const ruanganSelect = document.getElementById("ruanganSelect");
     const nomorKamarField = document.getElementById("nomorKamarField");
+    const rumahSelect = document.getElementById("rumahSelect");
+    const nomorRumahField = document.getElementById("nomorRumahField");
     const uploadFoto = document.getElementById("uploadFoto");
     const catatanKhusus = document.getElementById("catatanKhusus");
     const actionSection = document.getElementById("actionSection");
@@ -50,6 +52,7 @@
       });
 
       if (nomorKamarField) nomorKamarField.querySelector("input").value = "";
+      if (nomorRumahField) nomorRumahField.querySelector("input").value = "";
       form.querySelectorAll("textarea").forEach(el => el.value = "");
       form.querySelectorAll("input[type='file']").forEach(i => i.value = "");
       form.querySelectorAll("img[id^='preview']").forEach(img => img.classList.add("hidden"));
@@ -69,7 +72,7 @@
       actionSection.classList.remove("hidden");
     }
 
-    // ✅ Handle pilihan Asrama / Auditorium
+    // ✅ Handle pilihan Asrama / Auditorium / Rumpim
     function handleChecklist(value, type) {
       const savedTanggal = tanggalInput.value;
       const savedPetugas = namaPetugas.value;
@@ -80,6 +83,7 @@
 
       areas.forEach(area => area.classList.add("hidden"));
       if (nomorKamarField) nomorKamarField.classList.add("hidden");
+      if (nomorRumahField) nomorRumahField.classList.add("hidden");
 
       if (type === "asrama") {
         if (value.includes("Lantai") && !value.includes("Koridor")) {
@@ -108,6 +112,20 @@
         }
       }
 
+      if (type === "rumpim") {
+        if (value === "Rumah Dinas Eselon I") {
+          if (nomorRumahField) nomorRumahField.classList.add("hidden");
+          document.querySelector('[data-area="Area Utama"]').classList.remove("hidden");
+          document.querySelector('[data-area="Kamar Mandi"]').classList.remove("hidden");
+          document.querySelector('[data-area="Final Check"]').classList.remove("hidden");
+        } else if (value.includes("Rumah Dinas")) {
+          if (nomorRumahField) nomorRumahField.classList.remove("hidden");
+          document.querySelector('[data-area="Area Utama"]').classList.remove("hidden");
+          document.querySelector('[data-area="Kamar Mandi"]').classList.remove("hidden");
+          document.querySelector('[data-area="Final Check"]').classList.remove("hidden");
+        }
+      }
+
       if (value) {
         uploadFoto.classList.remove("hidden");
         catatanKhusus.classList.remove("hidden");
@@ -126,6 +144,11 @@
     if (ruanganSelect) {
       ruanganSelect.addEventListener("change", () => {
         handleChecklist(ruanganSelect.value, "auditorium");
+      });
+    }
+    if (rumahSelect) {
+      rumahSelect.addEventListener("change", () => {
+        handleChecklist(rumahSelect.value, "rumpim");
       });
     }
     form.addEventListener("change", (e) => {
