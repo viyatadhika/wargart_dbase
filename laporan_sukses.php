@@ -126,29 +126,43 @@ $group_rules_auditorium = [
 // ==========================
 // Pilih template & aturan
 // ==========================
+$total_items   = 0;
+$checked_items = 0;
+
+// ==========================
+// Pilih template & aturan
+// ==========================
+
 if ($type === "asrama") {
   $selected    = $data['lantai'] ?? 'Lantai';
   $template    = $template_asrama;
   $group_rules = $group_rules_asrama;
-} else {
+} elseif ($type === "auditorium") {
   $selected    = $data['ruangan'] ?? 'Auditorium';
   $template    = $template_auditorium;
   $group_rules = $group_rules_auditorium;
 }
 
+
 // ==========================
 // Hitung progress (fix selected)
 // ==========================
-$total_items   = 0;
-$checked_items = 0;
-
 foreach ($group_rules as $key => $categories) {
-  // Cocokkan exact atau mengandung kata (untuk Kelas 1, Kelas 2, dll)
-  if ($selected === $key || stripos($selected, $key) !== false) {
+  // khusus koridor → harus match duluan biar tidak kebawa ke "Lantai"
+  if ($key === "Koridor" && stripos($selected, "Koridor") !== false) {
     foreach ($categories as $kategori) {
       $items = $template[$kategori] ?? [];
       $total_items += count($items);
-
+      if (isset($checklist[$kategori])) {
+        $checked_items += count(array_intersect($checklist[$kategori], $items));
+      }
+    }
+  }
+  // untuk lantai umum (tapi jangan sampai mengandung kata koridor)
+  elseif ($key === "Lantai" && stripos($selected, "Lantai") !== false && stripos($selected, "Koridor") === false) {
+    foreach ($categories as $kategori) {
+      $items = $template[$kategori] ?? [];
+      $total_items += count($items);
       if (isset($checklist[$kategori])) {
         $checked_items += count(array_intersect($checklist[$kategori], $items));
       }
@@ -158,6 +172,39 @@ foreach ($group_rules as $key => $categories) {
 
 
 $progress = $total_items > 0 ? round(($checked_items / $total_items) * 100) : 0;
+
+
+
+// ==========================
+// Debug Dump (detail per kategori)
+// ==========================
+echo "<pre>";
+echo "DEBUG LAPORAN SUKSES\n";
+echo "Type       : " . htmlspecialchars($type) . "\n";
+echo "Selected   : " . htmlspecialchars($selected) . "\n\n";
+
+foreach ($group_rules as $key => $categories) {
+  if ($selected === $key || stripos($selected, $key) !== false) {
+    echo ">> Match Group Rule: {$key}\n";
+    foreach ($categories as $kategori) {
+      $items = $template[$kategori] ?? [];
+      echo "   - Kategori: {$kategori}, Item count: " . count($items) . "\n";
+
+      if (isset($checklist[$kategori])) {
+        echo "     Checklist tercentang: " . count($checklist[$kategori]) . "\n";
+        print_r($checklist[$kategori]);
+      }
+    }
+  }
+}
+
+echo "\nTotal Items : {$total_items}\n";
+echo "Checked     : {$checked_items}\n";
+echo "Progress    : {$progress}%\n";
+echo "</pre>";
+
+
+
 
 // Status berdasarkan progress
 if ($progress >= 80) {

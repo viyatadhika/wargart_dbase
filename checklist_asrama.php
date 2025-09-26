@@ -92,7 +92,7 @@ include 'header.php';
 
   <?php
   $areas = [
-    "Kamar Tidur"        => [
+    "Kamar Tidur" => [
       "Merapikan tempat tidur",
       "Menyapu & mengepel kamar",
       "Membersihkan meja & kursi",
@@ -106,17 +106,17 @@ include 'header.php';
       "Memastikan saluran air lancar",
       "Mengganti handuk"
     ],
-    "Amenities"             => [
+    "Amenities" => [
       "Mengganti air mineral",
       "Memastikan peralatan listrik (lampu, stop kontak, AC)"
     ],
-    "Koridor"              => [
+    "Koridor" => [
       "Menyapu seluruh area koridor",
       "Mengepel lantai koridor",
       "Membersihkan pagar/railing",
       "Membersihkan dinding"
     ],
-    "Final Check"         => [
+    "Final Check" => [
       "Pastikan semua area bersih & rapi",
       "Mengecek perlengkapan sesuai standar"
     ]
