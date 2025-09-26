@@ -172,41 +172,81 @@
     });
   });
 
-  // ambil semua input file
+  // 🔹 Fungsi kompres gambar di client-side
+  function compressImage(file, maxWidth = 1024, quality = 0.7) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = e => {
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height *= maxWidth / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          blob => resolve(new File([blob], file.name, {
+            type: "image/jpeg"
+          })),
+          "image/jpeg",
+          quality
+        );
+      };
+    });
+  }
+
+  // 🔹 Event listener untuk semua input foto
   document.querySelectorAll(".foto-input").forEach(input => {
-    input.addEventListener("change", (event) => {
-      const file = event.target.files[0];
+    input.addEventListener("change", async (event) => {
+      let file = event.target.files[0];
+      if (!file) return;
+
+      // Jika > 2MB → kompres dulu
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Ukuran file > 2MB, sedang dikompres...");
+        file = await compressImage(file, 1024, 0.7);
+      }
+
+      // tampilkan preview
       const previewId = "preview-" + input.id;
       const removeId = "remove-" + input.id;
       const preview = document.getElementById(previewId);
       const removeBtn = document.getElementById(removeId);
 
-      // validasi ukuran max 2 MB
-      if (file && file.size > 2 * 1024 * 1024) {
-        alert("Ukuran file tidak boleh lebih dari 2 MB!");
-        input.value = "";
-        preview.classList.add("hidden");
-        removeBtn.classList.add("hidden");
-        return;
-      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.classList.remove("hidden");
+        removeBtn.classList.remove("hidden");
+      };
+      reader.readAsDataURL(file);
 
-      // tampilkan preview
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          preview.src = e.target.result;
-          preview.classList.remove("hidden");
-          removeBtn.classList.remove("hidden");
-        };
-        reader.readAsDataURL(file);
-      }
+      // ganti file asli dengan file hasil kompres
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
     });
   });
 
-  // tombol hapus preview
+  // 🔹 Tombol hapus preview
   document.querySelectorAll(".remove-btn").forEach(button => {
     button.addEventListener("click", (e) => {
-      e.stopPropagation(); // ⛔ cegah trigger container click
+      e.stopPropagation();
       const inputId = button.id.replace("remove-", "");
       const input = document.getElementById(inputId);
       const preview = document.getElementById("preview-" + inputId);
@@ -218,11 +258,10 @@
     });
   });
 
-  // klik container → buka file dialog
+  // 🔹 Klik container = buka dialog
   document.querySelectorAll(".foto-container").forEach(container => {
     const input = container.querySelector(".foto-input");
     container.addEventListener("click", (e) => {
-      // biar tombol "X" tidak ikut trigger open dialog
       if (!e.target.classList.contains("remove-btn")) {
         input.click();
       }

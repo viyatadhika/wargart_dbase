@@ -181,8 +181,6 @@ if ($type === "asrama") {
   $group_rules = $group_rules_auditorium;
 }
 
-
-
 // ==========================
 // Hitung progress (fix selected)
 // ==========================
@@ -249,10 +247,7 @@ foreach ($group_rules as $key => $categories) {
   }
 }
 
-
 $progress = $total_items > 0 ? round(($checked_items / $total_items) * 100) : 0;
-
-
 
 // ==========================
 // Debug Dump (detail per kategori)
