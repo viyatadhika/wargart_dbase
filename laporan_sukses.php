@@ -168,6 +168,36 @@ foreach ($group_rules as $key => $categories) {
       }
     }
   }
+  // khusus auditorium
+  elseif ($key === "Auditorium" && stripos($selected, "Auditorium") !== false) {
+    foreach ($categories as $kategori) {
+      $items = $template[$kategori] ?? [];
+      $total_items += count($items);
+      if (isset($checklist[$kategori])) {
+        $checked_items += count(array_intersect($checklist[$kategori], $items));
+      }
+    }
+  }
+  // khusus kelas
+  elseif ($key === "Kelas" && stripos($selected, "Kelas") !== false) {
+    foreach ($categories as $kategori) {
+      $items = $template[$kategori] ?? [];
+      $total_items += count($items);
+      if (isset($checklist[$kategori])) {
+        $checked_items += count(array_intersect($checklist[$kategori], $items));
+      }
+    }
+  }
+  // khusus toilet
+  elseif ($key === "Toilet" && stripos($selected, "Toilet") !== false) {
+    foreach ($categories as $kategori) {
+      $items = $template[$kategori] ?? [];
+      $total_items += count($items);
+      if (isset($checklist[$kategori])) {
+        $checked_items += count(array_intersect($checklist[$kategori], $items));
+      }
+    }
+  }
 }
 
 
@@ -178,30 +208,30 @@ $progress = $total_items > 0 ? round(($checked_items / $total_items) * 100) : 0;
 // ==========================
 // Debug Dump (detail per kategori)
 // ==========================
-echo "<pre>";
-echo "DEBUG LAPORAN SUKSES\n";
-echo "Type       : " . htmlspecialchars($type) . "\n";
-echo "Selected   : " . htmlspecialchars($selected) . "\n\n";
+// echo "<pre>";
+// echo "DEBUG LAPORAN SUKSES\n";
+// echo "Type       : " . htmlspecialchars($type) . "\n";
+// echo "Selected   : " . htmlspecialchars($selected) . "\n\n";
 
-foreach ($group_rules as $key => $categories) {
-  if ($selected === $key || stripos($selected, $key) !== false) {
-    echo ">> Match Group Rule: {$key}\n";
-    foreach ($categories as $kategori) {
-      $items = $template[$kategori] ?? [];
-      echo "   - Kategori: {$kategori}, Item count: " . count($items) . "\n";
+// foreach ($group_rules as $key => $categories) {
+//   if ($selected === $key || stripos($selected, $key) !== false) {
+//     echo ">> Match Group Rule: {$key}\n";
+//     foreach ($categories as $kategori) {
+//       $items = $template[$kategori] ?? [];
+//       echo "   - Kategori: {$kategori}, Item count: " . count($items) . "\n";
 
-      if (isset($checklist[$kategori])) {
-        echo "     Checklist tercentang: " . count($checklist[$kategori]) . "\n";
-        print_r($checklist[$kategori]);
-      }
-    }
-  }
-}
+//       if (isset($checklist[$kategori])) {
+//         echo "     Checklist tercentang: " . count($checklist[$kategori]) . "\n";
+//         print_r($checklist[$kategori]);
+//       }
+//     }
+//   }
+// }
 
-echo "\nTotal Items : {$total_items}\n";
-echo "Checked     : {$checked_items}\n";
-echo "Progress    : {$progress}%\n";
-echo "</pre>";
+// echo "\nTotal Items : {$total_items}\n";
+// echo "Checked     : {$checked_items}\n";
+// echo "Progress    : {$progress}%\n";
+// echo "</pre>";
 
 
 
