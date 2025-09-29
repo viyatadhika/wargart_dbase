@@ -172,41 +172,74 @@
     });
   });
 
-  // 🔹 Fungsi kompres gambar di client-side
-  function compressImage(file, maxWidth = 1024, quality = 0.7) {
+  // 🔹 Fungsi kompres gambar pakai <canvas>
+  async function compressImage(file, maxSize = 1024, quality = 0.7) {
     return new Promise((resolve, reject) => {
-      const img = new Image();
       const reader = new FileReader();
+      reader.readAsDataURL(file);
 
-      reader.onload = e => {
-        img.src = e.target.result;
+      reader.onload = event => {
+        const img = new Image();
+        img.src = event.target.result;
+
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          // Resize kalau lebih besar dari maxSize
+          if (width > height) {
+            if (width > maxSize) {
+              height *= maxSize / width;
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width *= maxSize / height;
+              height = maxSize;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          function tryCompress(q) {
+            return new Promise((resolveQ) => {
+              canvas.toBlob(
+                blob => resolveQ(blob),
+                "image/jpeg",
+                q
+              );
+            });
+          }
+
+          (async () => {
+            let q = quality;
+            let blob = await tryCompress(q);
+
+            // ✅ Loop turunkan kualitas sampai <= 1MB
+            while (blob.size > 1 * 1024 * 1024 && q > 0.3) {
+              q -= 0.1;
+              blob = await tryCompress(q);
+            }
+
+            if (blob) {
+              resolve(new File([blob], file.name, {
+                type: "image/jpeg"
+              }));
+            } else {
+              reject(new Error("Gagal kompres gambar"));
+            }
+          })();
+        };
+
+        img.onerror = () => reject(new Error("Gagal load gambar"));
       };
-      reader.onerror = reject;
 
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height *= maxWidth / width;
-          width = maxWidth;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob(
-          blob => resolve(new File([blob], file.name, {
-            type: "image/jpeg"
-          })),
-          "image/jpeg",
-          quality
-        );
-      };
+      reader.onerror = () => reject(new Error("Gagal baca file"));
     });
   }
 
@@ -216,13 +249,21 @@
       let file = event.target.files[0];
       if (!file) return;
 
-      // Jika > 2MB → kompres dulu
-      if (file.size > 2 * 1024 * 1024) {
-        alert("Ukuran file > 2MB, sedang dikompres...");
+      // ✅ Validasi tipe file (hanya JPG/PNG)
+      const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Hanya file gambar JPG atau PNG yang diperbolehkan!");
+        input.value = "";
+        return;
+      }
+
+      // ✅ Jika > 1MB → kompres dulu
+      if (file.size > 1 * 1024 * 1024) {
+        alert("Ukuran file > 1MB, sedang dikompres...");
         file = await compressImage(file, 1024, 0.7);
       }
 
-      // tampilkan preview
+      // ✅ tampilkan preview
       const previewId = "preview-" + input.id;
       const removeId = "remove-" + input.id;
       const preview = document.getElementById(previewId);
@@ -236,7 +277,7 @@
       };
       reader.readAsDataURL(file);
 
-      // ganti file asli dengan file hasil kompres
+      // ✅ ganti file asli dengan file hasil kompres
       const dt = new DataTransfer();
       dt.items.add(file);
       input.files = dt.files;
@@ -258,7 +299,7 @@
     });
   });
 
-  // 🔹 Klik container = buka dialog
+  // 🔹 Klik container → buka file dialog
   document.querySelectorAll(".foto-container").forEach(container => {
     const input = container.querySelector(".foto-input");
     container.addEventListener("click", (e) => {
