@@ -6,7 +6,7 @@ include 'header.php';
 
 <!-- Form Checklist -->
 <form id="checklistForm" action="simpan_checklist.php" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="form_type" value="auditorium">
+    <input type="hidden" name="form_type" value="taman">
     <!-- Informasi Dasar -->
     <div class="bg-white rounded-2xl shadow-md p-6 mb-6" data-aos="fade-up">
         <h2 class="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800">
@@ -32,15 +32,15 @@ include 'header.php';
                     class="w-full border rounded-xl p-3 focus:ring-2 focus:ring-blue-300" required>
             </div>
 
-            <!-- Ruangan -->
+            <!-- Taman -->
             <div>
                 <label class="flex items-center text-sm font-medium text-gray-700 tracking-wide mb-1">
-                    <i data-lucide="building-2" class="w-4 h-4 text-blue-500 mr-1"></i> Nama Ruangan
+                    <i data-lucide="building-2" class="w-4 h-4 text-blue-500 mr-1"></i> Nama Taman
                 </label>
-                <select name="ruangan" id="ruanganSelect"
+                <select name="taman" id="tamanSelect"
                     class="w-full border border-gray-300 rounded-xl p-3 text-gray-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-300 transition"
                     required>
-                    <option value="" disabled selected>Pilih Ruangan</option>
+                    <option value="" disabled selected>Pilih Taman</option>
                     <option value="Auditorium">Auditorium</option>
                     <?php for ($i = 1; $i <= 19; $i++): ?>
                         <option value="Kelas <?= $i ?>">Kelas <?= $i ?></option>
